@@ -1,8 +1,11 @@
 package uk.gov.hmcts.case_management;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,12 +18,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import uk.gov.hmcts.case_management.controller.TaskController;
+import uk.gov.hmcts.case_management.dto.TaskRequest;
+import uk.gov.hmcts.case_management.model.Task;
 import uk.gov.hmcts.case_management.service.TaskService;
 
 @WebMvcTest(TaskController.class)
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-class UnitTests {
+class ControllerUnitTests {
   @Autowired private MockMvc mvc;
 
   @MockitoBean private TaskService service;
@@ -36,6 +41,21 @@ class UnitTests {
             "due": "2025-04-30T08:00:00"
         }
         """;
+
+    TaskRequest expectedRequest =
+        new TaskRequest(
+            "Clean desk",
+            "I spilled coffee on my desk and it ruined my keyboard",
+            "Todo",
+            LocalDateTime.parse("2025-04-30T08:00:00"));
+
+    Task mockTask = new Task();
+    mockTask.setTitle("Clean desk");
+    mockTask.setDescription("I spilled coffee on my desk and it ruined my keyboard");
+    mockTask.setStatus("Todo");
+    mockTask.setDue(LocalDateTime.parse("2025-04-30T08:00:00"));
+
+    when(service.createTask(expectedRequest)).thenReturn(mockTask);
 
     mvc.perform(
             post("/api/task")

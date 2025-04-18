@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public record TaskRequest(
-    int id,
     @NotNull String title,
     String description,
     @NotNull String status,

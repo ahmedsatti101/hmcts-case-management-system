@@ -12,7 +12,7 @@ import uk.gov.hmcts.case_management.repository.TaskRepository;
 public class TaskService {
   private final TaskRepository repository;
 
-  public void createTask(TaskRequest request) {
+  public Task createTask(TaskRequest request) {
     Task newTask = new Task();
 
     newTask.setTitle(request.title());
@@ -20,6 +20,6 @@ public class TaskService {
     newTask.setStatus(request.status());
     newTask.setDue(request.due());
 
-    repository.save(newTask);
+    return repository.save(newTask);
   }
 }
