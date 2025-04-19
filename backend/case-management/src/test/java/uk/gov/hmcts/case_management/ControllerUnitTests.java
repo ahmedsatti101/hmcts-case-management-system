@@ -8,7 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import uk.gov.hmcts.case_management.controller.TaskController;
 import uk.gov.hmcts.case_management.dto.TaskRequest;
@@ -30,7 +34,14 @@ import uk.gov.hmcts.case_management.service.TaskService;
 class ControllerUnitTests {
   @Autowired private MockMvc mvc;
 
+  @Autowired Optional<Task> task;
+
   @MockitoBean private TaskService service;
+
+  @BeforeEach
+  void setup() {
+    task = Optional.of(new Task(null, "Test task", "Test description", "Todo", LocalDateTime.now()));
+  }
 
   @Test
   void shouldCreateTask() throws Exception {
@@ -97,5 +108,33 @@ class ControllerUnitTests {
     mvc.perform(get("/api/task"))
       .andExpect(status().isOk())
       .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
+  void shouldReturnTaskWhenIdIsGiven() throws Exception {
+    when(service.retrieveTaskById(1)).thenReturn(task);
+
+    MvcResult result = mvc.perform(get("/api/task/{id}", 1))
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+      .andReturn();
+
+    String response = result.getResponse().getContentAsString();
+
+    Assertions.assertThat(response).isNotNull();
+  }
+
+  @Test
+  void throwNotFoundIfTaskDoesNotExist() throws Exception {
+    mvc.perform(get("/api/task/{id}", 100))
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.message").value("Task not found"));
+  }
+
+  @Test
+  void throwBadRequestIfIdIsInvalid() throws Exception {
+    mvc.perform(get("/api/task/banana"))
+      .andExpect(status().isBadRequest())
+      .andExpect(jsonPath("$.message").value("ID must be a number"));
   }
 }

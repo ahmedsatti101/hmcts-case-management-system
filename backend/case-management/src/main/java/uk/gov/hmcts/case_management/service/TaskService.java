@@ -1,6 +1,7 @@
 package uk.gov.hmcts.case_management.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -27,5 +28,9 @@ public class TaskService {
 
   public List<Task> retrieveAllTasks() {
     return repository.findAll();
+  }
+
+  public Optional<Task> retrieveTaskById(int id) {
+    return repository.findById(id);
   }
 }
