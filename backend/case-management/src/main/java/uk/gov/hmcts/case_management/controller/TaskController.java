@@ -1,8 +1,11 @@
 package uk.gov.hmcts.case_management.controller;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,5 +43,13 @@ public class TaskController {
   @ResponseStatus(HttpStatus.CREATED)
   public Task createNewTask(@Valid @RequestBody TaskRequest request) {
     return service.createTask(request);
+  }
+
+  @Operation(summary = "Get all tasks")
+  @ApiResponse(responseCode = "200", content = {@Content(mediaType = "application/json")})
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  public List<Task> getAllTasks() {
+    return service.retrieveAllTasks();
   }
 }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.case_management.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,5 +23,9 @@ public class TaskService {
     newTask.setDue(request.due());
 
     return repository.save(newTask);
+  }
+
+  public List<Task> retrieveAllTasks() {
+    return repository.findAll();
   }
 }
