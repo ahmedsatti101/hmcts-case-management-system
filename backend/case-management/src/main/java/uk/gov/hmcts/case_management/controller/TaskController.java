@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.case_management.dto.TaskRequest;
+import uk.gov.hmcts.case_management.dto.UpdateTaskResource;
 import uk.gov.hmcts.case_management.exception.ErrorObject;
 import uk.gov.hmcts.case_management.model.Task;
 import uk.gov.hmcts.case_management.service.TaskService;
@@ -72,5 +74,21 @@ public class TaskController {
     }
 
     return service.retrieveTaskById(id);
+  }
+
+  @Operation(summary = "Update task status")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))}),
+    @ApiResponse(responseCode = "404", description = "Task not found", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
+    @ApiResponse(responseCode = "400", description = "Bad request", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
+  })
+  @PatchMapping("/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public Task updateTask(@Valid @RequestBody UpdateTaskResource resource) {
+    if (service.retrieveTaskById(resource.id()).isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+    }
+
+    return service.updateTaskStatus(resource);
   }
 }
