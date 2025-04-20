@@ -47,4 +47,14 @@ public class TaskService {
     taskToBeUpdated.setStatus(resource.status());
     return repository.save(taskToBeUpdated);
   }
+
+  public void deleteRequestedTask(Long id) {
+    Task taskToBedeleted = null;
+
+    if (repository.findById(id).isPresent()) {
+      taskToBedeleted = repository.findById(id).get();
+    }
+
+    repository.delete(taskToBedeleted);
+  }
 }

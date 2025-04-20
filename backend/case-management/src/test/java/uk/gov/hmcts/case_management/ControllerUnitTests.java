@@ -2,6 +2,7 @@ package uk.gov.hmcts.case_management;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -182,5 +183,26 @@ class ControllerUnitTests {
     .accept(MediaType.APPLICATION_JSON))
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message").value("Task not found"));
+  }
+
+  @Test
+  void shouldDeleteTask() throws Exception {
+    when(service.retrieveTaskById(6L)).thenReturn(task);
+
+    mvc.perform(delete("/api/task/6"))
+      .andExpect(status().isNoContent());
+  }
+
+  @Test
+  void throwNotFoundForDeleteRequest() throws Exception {
+    mvc.perform(delete("/api/task/100"))
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.message").value("Task not found"));
+  }
+
+  @Test
+  void throwBadRequestForInvalidIdInDeleteRequest() throws Exception {
+    mvc.perform(delete("/api/task/dr"))
+      .andExpect(status().isBadRequest());
   }
 }

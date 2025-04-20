@@ -6,6 +6,7 @@ import java.util.Optional;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -90,5 +91,21 @@ public class TaskController {
     }
 
     return service.updateTaskStatus(resource);
+  }
+
+  @Operation(summary = "Delete task")
+  @ApiResponses({
+    @ApiResponse(responseCode = "404", description = "Task not found", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
+    @ApiResponse(responseCode = "400", description = "Bad request", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
+  })
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public String deleteTask(@Parameter(required = true, description = "Task id") @PathVariable Long id) {
+    if (service.retrieveTaskById(id).isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+    }
+
+    service.deleteRequestedTask(id);
+    return "Task deleted successfully";
   }
 }
