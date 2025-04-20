@@ -1,5 +1,6 @@
 package uk.gov.hmcts.case_management;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -146,21 +147,25 @@ class ControllerUnitTests {
 
   @Test
   void shouldUpdateTaskStatus() throws Exception {
-    Task updated = new Task(1L, "Test task", "Test task description", "Todo", LocalDateTime.now());
-    when(service.updateTaskStatus(new UpdateTaskResource(1L, "Done"))).thenReturn(updated);
+    Task updated = new Task(1L, "Test task", "Test task description", "Done", LocalDateTime.now());
+    
+    when(service.retrieveTaskById(1L)).thenReturn(Optional.of(task.get()));
+    
+    when(service.updateTaskStatus(any(UpdateTaskResource.class))).thenReturn(updated);
 
     MvcResult result = mvc.perform(patch("/api/task/{id}", 1)
-    .content(objectMapper.writeValueAsString(new UpdateTaskResource(1L, "Done")))
-    .characterEncoding("UTF-8")
-    .contentType(MediaType.APPLICATION_JSON_VALUE)
-    .accept(MediaType.APPLICATION_JSON))
-      .andExpect(status().isOk())
-    .andReturn();
+        .content(objectMapper.writeValueAsString(new UpdateTaskResource(1L, "Done")))
+        .characterEncoding("UTF-8")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andReturn();
 
     String response = result.getResponse().getContentAsString();
-
+    
     Assertions.assertThat(response).isNotNull();
-  }
+    Assertions.assertThat(response).contains("\"status\":\"Done\"");
+}
 
   @Test
   void throwBadRequestIfRequestBodyIsEmpty() throws Exception {
