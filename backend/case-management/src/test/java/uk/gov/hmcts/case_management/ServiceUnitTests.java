@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,5 +65,15 @@ class ServiceUnitTests {
 
     Assertions.assertThat(taskServiceMock.retrieveAllTasks()).isNotNull();
     Assertions.assertThat(taskServiceMock.retrieveAllTasks()).size().isEqualTo(1);
+  }
+
+  @Test
+  void serviceRetrievesTaskByIdAndReturnsIt() {
+    Optional<Task> newTask = Optional.of(new Task(null, "Test task", "Test task description", "Done", LocalDateTime.now()));
+    TaskService taskServiceMock = Mockito.mock(TaskService.class);
+
+    when(taskServiceMock.retrieveTaskById(newTask.get().getId())).thenReturn(newTask);
+
+    Assertions.assertThat(taskServiceMock.retrieveTaskById(newTask.get().getId())).isNotNull();
   }
 }

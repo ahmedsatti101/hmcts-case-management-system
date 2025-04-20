@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.case_management.dto.TaskRequest;
+import uk.gov.hmcts.case_management.exception.ErrorObject;
 import uk.gov.hmcts.case_management.model.Task;
 import uk.gov.hmcts.case_management.service.TaskService;
 
@@ -41,7 +42,7 @@ public class TaskController {
         content = {
           @Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))
         }),
-    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Bad request", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
   })
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -58,10 +59,14 @@ public class TaskController {
   }
 
   @Operation(summary = "Get task by ID")
-  @ApiResponse(responseCode = "200", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))})
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Task.class))}),
+    @ApiResponse(responseCode = "404", description = "Task not found", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
+    @ApiResponse(responseCode = "400", description = "Invalid ID provided", content = {@Content(schema = @Schema(implementation = ErrorObject.class), mediaType = "application/json")}),
+  })
   @GetMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Optional<Task> getTask(@Parameter(description = "Task id", required = true) @PathVariable int id) {
+  public Optional<Task> getTask(@Parameter(description = "Task id", required = true) @PathVariable Long id) {
     if (service.retrieveTaskById(id).isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
     }

@@ -30,7 +30,7 @@ public class TaskService {
     return repository.findAll();
   }
 
-  public Optional<Task> retrieveTaskById(int id) {
+  public Optional<Task> retrieveTaskById(Long id) {
     return repository.findById(id);
   }
 }

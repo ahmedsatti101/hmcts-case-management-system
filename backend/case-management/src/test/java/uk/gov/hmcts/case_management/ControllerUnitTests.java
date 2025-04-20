@@ -112,7 +112,7 @@ class ControllerUnitTests {
 
   @Test
   void shouldReturnTaskWhenIdIsGiven() throws Exception {
-    when(service.retrieveTaskById(1)).thenReturn(task);
+    when(service.retrieveTaskById(1L)).thenReturn(task);
 
     MvcResult result = mvc.perform(get("/api/task/{id}", 1))
       .andExpect(status().isOk())
