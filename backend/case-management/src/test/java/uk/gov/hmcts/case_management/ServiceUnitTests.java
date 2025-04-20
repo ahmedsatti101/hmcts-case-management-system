@@ -1,6 +1,8 @@
 package uk.gov.hmcts.case_management;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -104,5 +106,15 @@ class ServiceUnitTests {
     Assertions.assertThat(savedTask.getId()).isEqualTo(1L);
     Assertions.assertThat(savedTask.getTitle()).isEqualTo("Code");
     Assertions.assertThat(savedTask.getDescription()).isEqualTo("Finish coding assignment");
+  }
+
+  @Test
+  void serviceDeletesTask() {
+    Task task = new Task(1L, "Prepare for interview", "Prepare for interview on Tuesday at 1pm", "Done", LocalDateTime.of(2025, 4, 22, 13, 30, 00));
+    
+    when(repository.findById(1L)).thenReturn(Optional.of(task));
+    doNothing().when(repository).delete(task);
+
+    assertAll(() -> service.deleteRequestedTask(task.getId()));
   }
 }
