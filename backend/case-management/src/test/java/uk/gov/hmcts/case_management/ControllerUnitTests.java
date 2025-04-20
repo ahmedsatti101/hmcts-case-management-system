@@ -2,6 +2,7 @@ package uk.gov.hmcts.case_management;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -9,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import uk.gov.hmcts.case_management.controller.TaskController;
 import uk.gov.hmcts.case_management.dto.TaskRequest;
+import uk.gov.hmcts.case_management.dto.UpdateTaskResource;
 import uk.gov.hmcts.case_management.model.Task;
 import uk.gov.hmcts.case_management.service.TaskService;
 
@@ -35,6 +39,8 @@ class ControllerUnitTests {
   @Autowired private MockMvc mvc;
 
   @Autowired Optional<Task> task;
+
+  @Autowired ObjectMapper objectMapper;
 
   @MockitoBean private TaskService service;
 
@@ -136,5 +142,40 @@ class ControllerUnitTests {
     mvc.perform(get("/api/task/banana"))
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.message").value("ID must be a number"));
+  }
+
+  @Test
+  void shouldUpdateTaskStatus() throws Exception {
+    Task updated = new Task(1L, "Test task", "Test task description", "Todo", LocalDateTime.now());
+    when(service.updateTaskStatus(new UpdateTaskResource(1L, "Done"))).thenReturn(updated);
+
+    MvcResult result = mvc.perform(patch("/api/task/{id}", 1)
+    .content(objectMapper.writeValueAsString(new UpdateTaskResource(1L, "Done")))
+    .characterEncoding("UTF-8")
+    .contentType(MediaType.APPLICATION_JSON_VALUE)
+    .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isOk())
+    .andReturn();
+
+    String response = result.getResponse().getContentAsString();
+
+    Assertions.assertThat(response).isNotNull();
+  }
+
+  @Test
+  void throwBadRequestIfRequestBodyIsEmpty() throws Exception {
+    mvc.perform(patch("/api/task/1"))
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void throwNotFoundIfTaskNotFoundForPatchRequest() throws Exception {
+    mvc.perform(patch("/api/task/100")
+    .content(objectMapper.writeValueAsString(new UpdateTaskResource(100L, "Complete")))
+    .contentType(MediaType.APPLICATION_JSON_VALUE)
+    .characterEncoding("UTF-8")
+    .accept(MediaType.APPLICATION_JSON))
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.message").value("Task not found"));
   }
 }
