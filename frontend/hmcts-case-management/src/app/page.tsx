@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getAllTasks } from "./api";
+import { AxiosError } from "axios";
 
 interface Task {
   id: number;
@@ -12,7 +13,7 @@ interface Task {
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>();
-  const [error, setError] = useState<any>();
+  const [error, setError] = useState<AxiosError>();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -22,7 +23,9 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <p className="m-auto p-[10px] text-center">Loading...</p>;
+
+  if (error) return <p className="m-auto p-[10px] text-center">{error.message}</p>
 
   return (
     <>

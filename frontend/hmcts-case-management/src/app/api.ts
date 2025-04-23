@@ -6,6 +6,6 @@ export const getAllTasks = async () => {
       .get("http://localhost:8080/api/task");
     return response.data;
   } catch (err) {
-    return err;
+    throw err;
   }
 }
