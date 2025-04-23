@@ -18,19 +18,23 @@ describe("Page", () => {
       title: "Test task 2",
       description: null,
       status: "Pending...",
-    }
+    },
   ];
 
-  it("render 'Tasks' heading", () => {
+  it("render 'Tasks' heading", async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ data: [] });
+
     render(<Page />);
-    const heading = screen.getByRole("heading", { level: 1 });
+    const heading = await screen.findByRole("heading", { level: 1 });
 
     expect(heading).toBeInTheDocument();
   });
 
-  it("render button to add new task", () => {
+  it("render button to add new task", async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ data: [] });
+
     render(<Page />);
-    const button = screen.getByRole("button", { name: "Add new task" });
+    const button = await screen.findByRole("button", { name: "Add new task" });
 
     expect(button).toBeInTheDocument();
   });
@@ -41,8 +45,37 @@ describe("Page", () => {
     });
 
     render(<Page />);
-    const title = await screen.findAllByTestId("task-title");
+    const titles = await screen.findAllByTestId("task-title");
 
-    expect(title.length).toEqual(2);
+    expect(titles.length).toEqual(2);
+  });
+
+  it("render task description", async () => {
+    (axios.get as jest.Mock).mockResolvedValue({
+      data: mockData,
+    });
+
+    render(<Page />);
+    const descriptions = await screen.findAllByTestId("task-description");
+
+    expect(descriptions.length).toEqual(2);
+  });
+
+  it("render task status", async () => {
+    (axios.get as jest.Mock).mockResolvedValue({
+      data: mockData,
+    });
+
+    render(<Page />);
+    const statuses = await screen.findAllByTestId("task-status");
+
+    expect(statuses.length).toEqual(2);
+  });
+
+  it("render loading text while data is being fetched", () => {
+    render(<Page />);
+    const text = screen.getByText("Loading...");
+
+    expect(text).toBeInTheDocument();
   });
 });
