@@ -18,7 +18,7 @@ public class CaseManagementApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/api/task").allowedOrigins("http://localhost:3000");
+				registry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods("GET", "POST", "DELETE", "PATCH");
 			}
 		};
 	}
