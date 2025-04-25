@@ -3,13 +3,8 @@
 import { useEffect, useState } from "react";
 import { getAllTasks } from "./api";
 import { AxiosError } from "axios";
-
-interface Task {
-  id: number;
-  title: string;
-  description: string | null;
-  status: string;
-}
+import { Task } from "./taskModel";
+import Link from "next/link";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>();
@@ -41,9 +36,9 @@ export default function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2">
         {tasks?.map((task) => {
           return (
+            <Link href={`/task/${task.id}`} key={task.id}>
               <div
                 className="border rounded-[10px] mt-5 relative m-5 max-w-150 bg-[#fff9f9]"
-                key={task.id}
               >
                 <p className="text-2xl bg-[#7a93de] font-serif p-1" data-testid="task-title">{task.title}</p>
                 <p className="text-xl mt-1 font-serif p-1 mb-5" data-testid="task-description">
@@ -53,6 +48,7 @@ export default function Home() {
                   Status: {task.status}
                 </div>
               </div>
+            </Link>
           );
         })}
       </div>
