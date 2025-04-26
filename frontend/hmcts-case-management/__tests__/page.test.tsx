@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Page from "../src/app/page";
 import axios from "axios";
 
@@ -77,5 +77,31 @@ describe("Page", () => {
     const text = screen.getByText("Loading...");
 
     expect(text).toBeInTheDocument();
+  });
+
+  it("Pressing 'Add new task' button opens modal", async () => {
+    (axios.get as jest.Mock).mockResolvedValue({ data: [] });
+
+    render(<Page />);
+    const button = await screen.findByRole("button", { name: "Add new task" });
+    fireEvent.click(button);
+
+    const modal = await screen.findByTestId("create-task-modal");
+
+    expect(modal).toBeInTheDocument();
+  });
+
+  it("Pressing 'Cancel' after modal is opened when task needs to be created should close it", async () => {
+    render(<Page />);
+    const button = await screen.findByRole("button", { name: "Add new task" });
+    fireEvent.click(button);
+
+    const cancelButton = await screen.findByRole("button", { name: "Cancel" });
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => {
+      const modal = screen.queryByTestId("create-task-modal");
+      expect(modal).not.toBeInTheDocument();
+    });
   });
 });
