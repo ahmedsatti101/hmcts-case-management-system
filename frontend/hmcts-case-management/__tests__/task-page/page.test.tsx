@@ -1,5 +1,5 @@
 import Page from "@/app/task/[id]/page";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { Task } from "@/app/taskModel";
 import axios from "axios";
@@ -64,5 +64,31 @@ describe("Single task page", () => {
     render(<Page />);
 
     expect(screen.getByText("Loading...")).toBeInTheDocument();
+  });
+
+  it("Should render 'Delete task' button on the screen", async () => {
+    const button = await screen.findByRole("button", { name: "Delete task" });
+
+    expect(button).toBeInTheDocument();
+  });
+
+  it("Pressing on 'Delete task' button should trigger opening modal", async () => {
+    const button = await screen.findByRole("button", { name: "Delete task" });
+    fireEvent.click(button);
+
+    await screen.findByText("Are you sure you want to delete this task? This action is cannot be undone.")
+  });
+
+  it("Pressing 'Cancel' after modal is opened when task needs to be deleted should close it", async () => {
+    const button = await screen.findByRole("button", { name: "Delete task" });
+    fireEvent.click(button);
+
+    const cancelButton = await screen.findByRole("button", { name: "Cancel" });
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => {
+      const text = screen.queryByText("Are you sure you want to delete this task? This action is cannot be undone.");
+      expect(text).not.toBeInTheDocument();
+    }); 
   });
 });
