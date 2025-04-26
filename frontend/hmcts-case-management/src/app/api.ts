@@ -41,3 +41,13 @@ export const createTask = async (title: string, description: string | null, stat
     throw error;
   }
 }
+
+export const updateTaskStatus = async (id: string, status: string) => {
+  try {
+    const response = await axios
+      .patch(url + `/${id}`, { id, status });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}

@@ -34,7 +34,7 @@ export default function Home() {
       <h1 className="m-4 font-serif text-3xl">Tasks</h1>
       <div className="flex flex-row-reverse">
         <button
-          className="mr-4 font-serif text-xl p-1 border rounded-[7px]"
+          className="mr-4 font-semibold text-gray-900 text-lg p-1 border rounded-[7px]"
           onClick={handleAddingTask}
         >
           Add new task
