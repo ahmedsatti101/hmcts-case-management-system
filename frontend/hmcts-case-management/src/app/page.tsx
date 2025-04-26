@@ -5,11 +5,13 @@ import { getAllTasks } from "./api";
 import { AxiosError } from "axios";
 import { Task } from "./taskModel";
 import Link from "next/link";
+import Modal from "./modal";
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>();
   const [error, setError] = useState<AxiosError>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     getAllTasks()
@@ -18,17 +20,22 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleAddingTask = () => {
+    setOpen(true);
+  }
+
   if (loading) return <p className="m-auto p-[10px] text-center">Loading...</p>;
 
-  if (error) return <p className="m-auto p-[10px] text-center">{error.message}</p>
+  if (error) return <p className="m-auto p-[10px] text-center">{error.message}</p>;
 
   return (
     <>
+      <Modal open={open} setOpenAction={setOpen}/>
       <h1 className="m-4 font-serif text-3xl">Tasks</h1>
       <div className="flex flex-row-reverse">
         <button
           className="mr-4 font-serif text-xl p-1 border rounded-[7px]"
-          onClick={() => console.log("task created")}
+          onClick={handleAddingTask}
         >
           Add new task
         </button>

@@ -31,3 +31,13 @@ export const deleteTask = async (id: string) => {
     throw error;
   }
 }
+
+export const createTask = async (title: string, description: string | null, status: string, due: string) => {
+  try {
+    const response = await axios
+      .post(url, { title, description, status, due });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
