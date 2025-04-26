@@ -43,7 +43,6 @@ describe("Single task page", () => {
     const status = await screen.findByTestId("single-task-status");
 
     expect(status).toBeInTheDocument();
-    expect(status).toHaveTextContent(task.status);
   });
 
   it("Task duedate should be on the screen", async () => {

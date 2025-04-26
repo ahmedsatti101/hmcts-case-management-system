@@ -1,6 +1,6 @@
 "use client";
 
-import { getSingleTask } from "@/app/api";
+import { getSingleTask, updateTaskStatus } from "@/app/api";
 import { Task } from "@/app/taskModel";
 import { AxiosError } from "axios";
 import Link from "next/link";
@@ -38,7 +38,7 @@ export default function Page() {
     <>
       <div className="flex flex-row">
         <Link
-          className="m-4 font-serif text-xl p-1 border rounded-[7px]"
+          className="m-4 font-semibold text-lg p-1 border rounded-[7px]"
           href="/"
           data-testid="back-home-button"
         >
@@ -59,16 +59,30 @@ export default function Page() {
         >
           {task?.description ? task.description : "No description provided"}
         </p>
-        <p className="text-xl font-serif p-1" data-testid="single-task-status">
-          Status: {task?.status}
-        </p>
+        <div className="text-xl font-serif p-1" data-testid="single-task-status">
+          Status: {" "}
+          <select
+            value={task?.status || ""}
+            onChange={(e) => {
+              if (task && id) {
+                updateTaskStatus(id, e.target.value)
+                  .then(updatedTask => setTask(updatedTask))
+                  .catch(err => console.error(err));
+              }
+            }}
+            className="ml-2 text-lg border rounded-md p-1">
+            <option value="Todo">Todo</option>
+            <option value="Complete">Complete</option>
+            <option value="In progress">In progress</option>
+          </select>
+        </div>
         <p className="text-xl font-serif p-1" data-testid="single-task-duedate">
           Due by: {dueDateTime.toISOString().substring(0, 10)}{" "}
           {dueDateTime.toISOString().substring(11, 16)}
         </p>
       </div>
       <div className="flex flex-row-reverse">
-        <button className="border rounded-[7px] font-serif text-xl p-1 mr-2 bg-red-600 text-white" onClick={openModal}>
+        <button className="border rounded-[7px] font-semibold text-lg p-1 mr-2 bg-red-600 text-white" onClick={openModal}>
           Delete task
         </button>
       </div>
