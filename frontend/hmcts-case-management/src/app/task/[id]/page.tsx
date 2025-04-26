@@ -6,12 +6,14 @@ import { AxiosError } from "axios";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import Modal from "./modal";
 
 export default function Page() {
   const { id } = useParams<{ id: string }>();
   const [task, setTask] = useState<Task>();
   const [error, setError] = useState<AxiosError>();
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
   const dueDateTime = new Date(task?.due);
 
   useEffect(() => {
@@ -22,6 +24,10 @@ export default function Page() {
         .finally(() => setLoading(false));
     }
   }, [id]);
+
+  const openModal = () => {
+    setOpen(true); 
+  };
 
   if (loading) return <p className="m-auto p-[10px] text-center">Loading...</p>;
 
@@ -61,6 +67,12 @@ export default function Page() {
           {dueDateTime.toISOString().substring(11, 16)}
         </p>
       </div>
+      <div className="flex flex-row-reverse">
+        <button className="border rounded-[7px] font-serif text-xl p-1 mr-2 bg-red-600 text-white" onClick={openModal}>
+          Delete task
+        </button>
+      </div>
+      <Modal open={open} setOpenAction={setOpen} taskId={id} setErrorAction={setError}/>
     </>
   );
 }

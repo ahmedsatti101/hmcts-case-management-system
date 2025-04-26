@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const url = "http://localhost:8080/api/task";
+
 export const getAllTasks = async () => {
   try {
     const response = await axios
-      .get("http://localhost:8080/api/task");
+      .get(url);
     return response.data;
   } catch (err) {
     throw err;
@@ -13,7 +15,17 @@ export const getAllTasks = async () => {
 export const getSingleTask = async (id: string) => {
   try {
     const response = await axios
-      .get(`http://localhost:8080/api/task/${id}`);
+      .get(url + `/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const deleteTask = async (id: string) => {
+  try {
+    const response = await axios
+      .delete(url + `/${id}`);
     return response.data;
   } catch (error) {
     throw error;

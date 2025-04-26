@@ -34,7 +34,7 @@ export default function Home() {
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2">
-        {tasks?.map((task) => {
+        {tasks?.length ? (tasks?.map((task) => {
           return (
             <Link href={`/task/${task.id}`} key={task.id}>
               <div
@@ -50,7 +50,11 @@ export default function Home() {
               </div>
             </Link>
           );
-        })}
+        })) : (
+          <p className="text-center p-4 text-gray-500">
+            No tasks found. Click "Add new task" to create a task.
+          </p>
+        )}
       </div>
     </>
   );
