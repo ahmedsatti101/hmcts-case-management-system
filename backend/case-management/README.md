@@ -9,11 +9,11 @@ Create a `.env` file in the root of this directory, which will be used to create
 
 Create the database with the provided [docker-compose.yml](./docker-compose.yml) file by running:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 or
 ```bash
-docker-compose up
+docker compose up
 ```
 to follow the container logs.
 
